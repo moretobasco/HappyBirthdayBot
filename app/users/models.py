@@ -17,3 +17,5 @@ class Users(Base):
     user_id: Mapped[int] = mapped_column(primary_key=True)
     user_name: Mapped[str]
     birthday: Mapped[date] = mapped_column(Date)
+    day: Mapped[str]
+    month: Mapped[str]
