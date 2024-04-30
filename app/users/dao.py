@@ -24,20 +24,21 @@ class UsersDAO(BaseDAO):
         async with async_session_maker() as session:
             # query = select(func.extract('year', func.current_date())-func.extract('year', cls.model.birthday))
             # query = select(func.extract('year', func.current_date()))
-            # query = select(func.lpad('1', 2, '0'))
-            query = func.concat()
+            query = select(func.lpad('1', 2, '0'))
             result = await session.execute(query)
             # return result.mappings().all()
             print(result.mappings().all())
 
 
-# async def test():
-#     return await test()
-#
-#
-# async def main():
-#     task = asyncio.create_task(test())
-#     await task
-#
-# asyncio.run(main())
+# async def test123():
+#     return await UsersDAO.test()
+
+
+async def main():
+    task = asyncio.create_task(UsersDAO.test())
+    await asyncio.gather(task)
+    # coro1 = UsersDAO.test()
+    # await coro1
+
+asyncio.get_event_loop().run_until_complete(main())
 
