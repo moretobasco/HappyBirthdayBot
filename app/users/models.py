@@ -16,9 +16,9 @@ class Users(Base):
 
     user_id: Mapped[int] = mapped_column(primary_key=True)
     user_name: Mapped[str]
-    day: Mapped[str]
-    month: Mapped[str]
+    b_day: Mapped[str]
+    b_month: Mapped[str]
     # birthday: Mapped[date] = mapped_column(Computed(
     #     "cast(concat(cast(extract('year' from current_date) as VARCHAR), month, day) as Date)")
     # )
-    current_date: Mapped[date] = mapped_column(Computed("current_date"))
+    birthday: Mapped[date]
