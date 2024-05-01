@@ -1,6 +1,6 @@
 from sqlalchemy.orm import mapped_column, Mapped
 from datetime import date, timedelta
-from sqlalchemy import Date, Computed, func
+from sqlalchemy import Date, Computed, func, cast, VARCHAR
 from sqlalchemy import Interval
 from sqlalchemy.dialects.postgresql import INTERVAL
 
@@ -16,6 +16,9 @@ class Users(Base):
 
     user_id: Mapped[int] = mapped_column(primary_key=True)
     user_name: Mapped[str]
-    birthday: Mapped[date] = mapped_column(Date)
     day: Mapped[str]
     month: Mapped[str]
+    # birthday: Mapped[date] = mapped_column(Computed(
+    #     "cast(concat(cast(extract('year' from current_date) as VARCHAR), month, day) as Date)")
+    # )
+    current_date: Mapped[date] = mapped_column(Computed("current_date"))

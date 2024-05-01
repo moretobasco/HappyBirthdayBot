@@ -4,7 +4,7 @@ from datetime import datetime
 from app.dao.base import BaseDAO
 from app.database import async_session_maker
 from app.users.models import Users
-from sqlalchemy import select, func, Interval, cast
+from sqlalchemy import select, func, Interval, cast, String, text, Date, column, VARCHAR, Select
 from sqlalchemy.dialects.postgresql import INTERVAL
 
 
@@ -24,7 +24,15 @@ class UsersDAO(BaseDAO):
         async with async_session_maker() as session:
             # query = select(func.extract('year', func.current_date())-func.extract('year', cls.model.birthday))
             # query = select(func.extract('year', func.current_date()))
-            query = select(func.lpad('1', 2, '0'))
+            # query = select(func.lpad('1', 2, '0'))
+            # query = select(cast(func.extract('months', func.current_date())), String)
+            # query = select(cast(func.extract('day', cls.model.birthday), VARCHAR))
+            # query = select(func.lpad(cast(func.extract('day', cls.model.birthday), String)), 2, '0')
+            # query = select(func.extract('months', func.current_date()))
+            # query = select(cast(func.concat('2024', '05', '05'), Date))
+            query = select(cls.model.user_id, cls.model.user_name, cast(
+                func.concat(
+                    cast(func.extract('year', func.current_date()), VARCHAR), cls.model.month, cls.model.day), Date))
             result = await session.execute(query)
             # return result.mappings().all()
             print(result.mappings().all())

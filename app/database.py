@@ -4,7 +4,7 @@ from app.config import settings
 from sqlalchemy import func
 
 
-engine = create_async_engine(settings.DATABASE_URL)
+engine = create_async_engine(settings.DATABASE_URL, echo=True)
 async_session_maker = async_sessionmaker(bind=engine, expire_on_commit=False)
 
 
