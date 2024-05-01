@@ -7,5 +7,5 @@ router = APIRouter(
 
 
 @router.get('get_birthdays')
-async def get_birthdays():
-    return await UsersDAO.test()
+async def get_birthdays(duration: int):
+    return await UsersDAO.test(duration=duration)

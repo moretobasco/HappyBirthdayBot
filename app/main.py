@@ -6,6 +6,6 @@ app = FastAPI()
 
 app.include_router(users_router)
 
-@app.get("")
-async def get_birthday():
-    return
+# @app.get("")
+# async def get_birthday():
+#     return
