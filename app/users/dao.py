@@ -44,7 +44,12 @@ class UsersDAO(BaseDAO):
             - CURRENT_DATE >= 0 AND CAST(concat(CAST(EXTRACT(year FROM CURRENT_DATE) AS VARCHAR), users.b_month, users.b_day) AS DATE)
             - CURRENT_DATE <=15
             """
-            query = select(cls.model.user_name).where(
+            query = select(
+                cls.model.user_name,
+                (cast(func.concat(cast(func.extract('year', func.current_date()), VARCHAR),
+                                 cls.model.b_month,
+                                 cls.model.b_day), Date) - func.current_date()).label('duration')
+            ).where(
                 and_(
                     cast(func.concat(cast(func.extract('year', func.current_date()), VARCHAR),
                                      cls.model.b_month,
@@ -52,7 +57,12 @@ class UsersDAO(BaseDAO):
                     cast(func.concat(cast(func.extract('year', func.current_date()), VARCHAR),
                                      cls.model.b_month,
                                      cls.model.b_day), Date) - func.current_date() >= 0)
-                     )
+                     ).order_by('duration')
+
+            # query = select(cls.model.user_name,
+            #                (cast(func.concat(cast(func.extract('year', func.current_date()), VARCHAR),
+            #                                 cls.model.b_month,
+            #                                 cls.model.b_day), Date)-func.current_date()).label('abc')).order_by('abc')
 
             result = await session.execute(query)
             # return result.mappings().all()
