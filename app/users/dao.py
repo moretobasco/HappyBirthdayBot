@@ -22,9 +22,12 @@ class UsersDAO(BaseDAO):
     @classmethod
     async def birthdays_this_month(cls):
         async with async_session_maker() as session:
-            query = select(cls.model).where(
-                cast(func.extract('month', func.current_date()), VARCHAR) == func.lpad(cls.model.b_month, 2, "0")
-            )
+            # query = select(cls.model).where(
+            #     cast(func.extract('month', func.current_date()), VARCHAR) == func.lpad(cls.model.b_month, 2, "0")
+            # )
+            # query = select(func.lpad(cls.model.b_month, 2, "0"))
+            # query = select(func.lpad(func.extract('month', func.current_date()), VARCHAR), 2, "0")
+            query = select(func.lpad(cast(func.extract('month', func.current_date()), VARCHAR), 2, "0"))
             result = await session.execute(query)
             print(result.mappings().all())
             # return result.mappings().all()
