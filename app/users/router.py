@@ -6,6 +6,11 @@ router = APIRouter(
 )
 
 
-@router.get('get_birthdays')
-async def get_birthdays(duration: int):
-    return await UsersDAO.test(duration=duration)
+@router.get('in_horizon')
+async def get_birthdays(horizon: int):
+    return await UsersDAO.birthdays_in_horizon(duration=horizon)
+
+
+@router.get('this_month')
+async def get_birthdays():
+    return await UsersDAO.birthdays_this_month()

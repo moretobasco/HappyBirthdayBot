@@ -20,7 +20,20 @@ class UsersDAO(BaseDAO):
 
 
     @classmethod
-    async def test(cls, duration):
+    async def birthdays_this_month(cls):
+        async with async_session_maker() as session:
+            query = select(cls.model).where(
+                cast(func.extract('month', func.current_date()), VARCHAR) == func.lpad(cls.model.b_month, 2, "0")
+            )
+            result = await session.execute(query)
+            print(result.mappings().all())
+            # return result.mappings().all()
+
+
+
+
+    @classmethod
+    async def birthdays_in_horizon(cls, duration):
         async with (async_session_maker() as session):
             """
             SELECT *
@@ -34,7 +47,7 @@ class UsersDAO(BaseDAO):
             """
 
             query = select(
-                cls.model
+                cls.model.__table__.columns
             ).where(
                 and_(
                     cast(func.concat(cast(func.extract('year', func.current_date()), VARCHAR),
@@ -60,15 +73,15 @@ class UsersDAO(BaseDAO):
 
 
 
-# async def test123():
-#     return await UsersDAO.test()
+async def test123():
+    return await UsersDAO.birthdays_this_month()
 
 
-# async def main():
-#     task = asyncio.create_task(UsersDAO.test(30))
-#     await asyncio.gather(task)
-#     # coro1 = UsersDAO.test()
-#     # await coro1
-#
-# asyncio.get_event_loop().run_until_complete(main())
+async def main():
+    task = asyncio.create_task(UsersDAO.birthdays_this_month())
+    await asyncio.gather(task)
+    # coro1 = UsersDAO.test()
+    # await coro1
+
+asyncio.get_event_loop().run_until_complete(main())
 
