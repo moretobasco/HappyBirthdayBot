@@ -27,7 +27,12 @@ class UsersDAO(BaseDAO):
             # )
             # query = select(func.lpad(cls.model.b_month, 2, "0"))
             # query = select(func.lpad(func.extract('month', func.current_date()), VARCHAR), 2, "0")
-            query = select(func.lpad(cast(func.extract('month', func.current_date()), VARCHAR), 2, "0"))
+            # query = select(func.lpad(cast(func.extract('month', func.current_date()), VARCHAR), 2, "0"))
+            # query = select(func.lpad(cast(func.extract('month', cls.model.birthday), VARCHAR), 2, "0"))
+            query = select(cls.model.__table__.columns).where(
+                func.lpad(cast(func.extract('month', cls.model.birthday), VARCHAR), 2, "0") ==
+                func.lpad(cast(func.extract('month', func.current_date()), VARCHAR), 2, "0")
+            ).order_by(func.extract('day', cls.model.birthday))
             result = await session.execute(query)
             print(result.mappings().all())
             # return result.mappings().all()
