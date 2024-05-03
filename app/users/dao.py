@@ -73,13 +73,23 @@ class UsersDAO(BaseDAO):
         async with (async_session_maker() as session):
             """
             SELECT *
-            FROM users
+            FROM users 
             WHERE
-            CAST(concat(CAST(EXTRACT(year FROM CURRENT_DATE) AS VARCHAR), users.b_month, users.b_day) AS DATE)
-            - CURRENT_DATE >= 0 AND CAST(concat(CAST(EXTRACT(year FROM CURRENT_DATE) AS VARCHAR), users.b_month, users.b_day) AS DATE)
-            - CURRENT_DATE <=30
-            ORDER BY CAST(concat(CAST(EXTRACT(year FROM CURRENT_DATE) AS VARCHAR), users.b_month, users.b_day) AS DATE)
-            - CURRENT_DATE
+            CAST(concat(
+                CAST(EXTRACT(year FROM CURRENT_DATE) AS VARCHAR),
+                lpad(CAST(EXTRACT(month FROM users.birthday) AS VARCHAR), 2, '0'),
+                lpad(CAST(EXTRACT(day FROM users.birthday) AS VARCHAR), 2, '0')
+            ) AS DATE) - CURRENT_DATE <= 15
+            AND CAST(concat(
+                CAST(EXTRACT(year FROM CURRENT_DATE) AS VARCHAR),
+                lpad(CAST(EXTRACT(month FROM users.birthday) AS VARCHAR), 2, '0'),
+                lpad(CAST(EXTRACT(day FROM users.birthday) AS VARCHAR), 2, '0')
+            ) AS DATE) - CURRENT_DATE >= 0
+            ORDER BY CAST(
+                concat(
+                    CAST(EXTRACT(year FROM CURRENT_DATE) AS VARCHAR),
+                    lpad(CAST(EXTRACT(month FROM users.birthday) AS VARCHAR), 2, '0'),
+                    lpad(CAST(EXTRACT(day FROM users.birthday) AS VARCHAR), 2, '0')) AS DATE) - CURRENT_DATE
             """
 
             query = select(
