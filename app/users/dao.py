@@ -12,13 +12,6 @@ class UsersDAO(BaseDAO):
     model = Users
 
     @classmethod
-    async def find_all(cls):
-        async with async_session_maker() as session:
-            query = select(cls.model.__table__.columns)
-            result = await session.execute(query)
-            return result.mappings().all()
-
-    @classmethod
     async def birthdays_this_month(cls):
         async with async_session_maker() as session:
             """
@@ -67,7 +60,6 @@ class UsersDAO(BaseDAO):
             # return result.mappings().all()
             print(result.mappings().all())
 
-
     @classmethod
     async def birthdays_in_horizon_v2(cls, duration):
         async with (async_session_maker() as session):
@@ -96,15 +88,21 @@ class UsersDAO(BaseDAO):
                 cls.model.__table__.columns
             ).where(
                 and_(
-                    cast(func.concat(cast(func.extract('year', func.current_date()), VARCHAR),
-                                     func.lpad(cast(func.extract('month', cls.model.birthday), VARCHAR), 2, "0"),
-                                     func.lpad(cast(func.extract('day', cls.model.birthday), VARCHAR), 2, "0")), Date) - func.current_date() <= duration,
-                    cast(func.concat(cast(func.extract('year', func.current_date()), VARCHAR),
-                                     func.lpad(cast(func.extract('month', cls.model.birthday), VARCHAR), 2, "0"),
-                                     func.lpad(cast(func.extract('day', cls.model.birthday), VARCHAR), 2, "0")), Date) - func.current_date() >= 0)
-            ).order_by((cast(func.concat(cast(func.extract('year', func.current_date()), VARCHAR),
-                                         func.lpad(cast(func.extract('month', cls.model.birthday), VARCHAR), 2, "0"),
-                                         func.lpad(cast(func.extract('day', cls.model.birthday), VARCHAR), 2, "0")), Date) - func.current_date()))
+                    cast(func.concat(
+                        cast(func.extract('year', func.current_date()), VARCHAR),
+                        func.lpad(cast(func.extract('month', cls.model.birthday), VARCHAR), 2, "0"),
+                        func.lpad(cast(func.extract('day', cls.model.birthday), VARCHAR), 2, "0")),
+                         Date) - func.current_date() <= duration,
+                    cast(func.concat(
+                        cast(func.extract('year', func.current_date()), VARCHAR),
+                        func.lpad(cast(func.extract('month', cls.model.birthday), VARCHAR), 2, "0"),
+                        func.lpad(cast(func.extract('day', cls.model.birthday), VARCHAR), 2, "0")),
+                         Date) - func.current_date() >= 0)
+            ).order_by((cast(func.concat(
+                cast(func.extract('year', func.current_date()), VARCHAR),
+                func.lpad(cast(func.extract('month', cls.model.birthday), VARCHAR), 2, "0"),
+                func.lpad(cast(func.extract('day', cls.model.birthday), VARCHAR), 2, "0")),
+                Date) - func.current_date()))
 
             result = await session.execute(query)
             # return result.mappings().all()
@@ -126,3 +124,4 @@ async def main():
 
 
 asyncio.get_event_loop().run_until_complete(main())
+

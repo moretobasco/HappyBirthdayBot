@@ -16,7 +16,7 @@ def generate_secret():
 
 def write_email(addressee: str):
     email = EmailMessage()
-    email['Subject'] = 'Verify your email'
+    email['Subject'] = 'Verify your email for a Birthdaybot'
     email['From'] = settings.SMTP_USER
     email['To'] = addressee
 
