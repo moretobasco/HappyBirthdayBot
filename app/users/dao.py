@@ -105,8 +105,8 @@ class UsersDAO(BaseDAO):
                 Date) - func.current_date()))
 
             result = await session.execute(query)
-            # return result.mappings().all()
-            print(result.mappings().all())
+            return result.mappings().all()
+            # print(result.mappings().all())
 
     @classmethod
     async def add_user(cls, **data):
@@ -116,12 +116,12 @@ class UsersDAO(BaseDAO):
             await session.commit()
 
 
-async def main():
-    task = asyncio.create_task(UsersDAO.birthdays_in_horizon_v2(5))
-    await asyncio.gather(task)
-    # coro1 = UsersDAO.test()
-    # await coro1
-
-
-asyncio.get_event_loop().run_until_complete(main())
+# async def main():
+#     task = asyncio.create_task(UsersDAO.birthdays_in_horizon_v2(5))
+#     await asyncio.gather(task)
+#     # coro1 = UsersDAO.test()
+#     # await coro1
+#
+#
+# asyncio.get_event_loop().run_until_complete(main())
 
