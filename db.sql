@@ -330,6 +330,9 @@ INSERT INTO users (user_id, user_name, birthday, b_day, b_month) VALUES
 (99, 'Ulysses', '1999-09-24', '24', '09'),
 (100, 'Vera', '1981-06-10', '10', '06');
 
+INSERT INTO subscriptions (subscription_id, user_id, user_sub_id, notify_before_days, notify_on_day) VALUES
+(1, 1, 6, '[10, 5]', TRUE),
+(2, 1, 99, '[3, 1]', FALSE);
 
 
 CREATE TABLE users (

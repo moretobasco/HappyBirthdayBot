@@ -3,6 +3,7 @@ import asyncio
 from fastapi import FastAPI, Request
 from taskiq import InMemoryBroker
 from app.users.router import router as users_router
+from app.subscription.router import router as subscription_router
 
 app = FastAPI()
 
@@ -25,3 +26,4 @@ async def send_notification(request: Request):
 
 
 app.include_router(users_router)
+app.include_router(subscription_router)
