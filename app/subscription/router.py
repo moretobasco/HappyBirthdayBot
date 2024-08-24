@@ -6,6 +6,6 @@ router = APIRouter(
 )
 
 
-@router.get('/{days}')
-async def get_birthdays(days: int):
-    return await SubscriptionsDAO.test_subs(5)
+@router.get('/getsub')
+async def get_subscriptions():
+    return await SubscriptionsDAO.test_subs()
