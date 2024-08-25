@@ -28,7 +28,22 @@ lpad(CAST(EXTRACT(day FROM users.birthday) AS VARCHAR), 2, '0')) AS DATE) - CURR
                 Subscriptions.__table__.columns,
                 Users.__table__.columns
             ).join(Subscriptions, Users.user_id == Subscriptions.user_sub_id).where(
-                Subscriptions.notify_before_days.contains(cast(func.to_jsonb("тут доделать запрос"), JSONB))
+                Subscriptions.notify_before_days.contains(cast(func.to_jsonb(cast(func.concat(
+                        cast(func.extract('year', func.current_date()), VARCHAR),
+                        func.lpad(cast(func.extract('month', Users.birthday), VARCHAR), 2, "0"),
+                        func.lpad(cast(func.extract('day', Users.birthday), VARCHAR), 2, "0")),
+                         Date) - func.current_date()), JSONB))
             )
             result = await session.execute(query)
             return result.mappings().all()
+
+
+
+# async def main():
+#     task = asyncio.create_task(SubscriptionsDAO.test_subs())
+#     await asyncio.gather(task)
+#     # coro1 = UsersDAO.test()
+#     # await coro1
+#
+#
+# asyncio.get_event_loop().run_until_complete(main())
