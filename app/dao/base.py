@@ -1,3 +1,5 @@
+from datetime import date
+
 from app.database import async_session_maker
 from sqlalchemy import select
 
@@ -18,3 +20,5 @@ class BaseDAO:
             query = select(cls.model.__table__.columns).filter_by(**filter_by)
             result = await session.execute(query)
             return result.mappings().one_or_none()
+
+
