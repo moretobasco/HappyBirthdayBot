@@ -23,6 +23,7 @@ class SubscriptionsDAO(BaseDAO):
         CAST(EXTRACT(year FROM CURRENT_DATE) AS VARCHAR),
         lpad(CAST(EXTRACT(month FROM users.birthday) AS VARCHAR), 2, '0'),
         lpad(CAST(EXTRACT(day FROM users.birthday) AS VARCHAR), 2, '0')) AS DATE) - CURRENT_DATE)
+        OR subscriptions.notify_on_day = TRUE
         """
         async with async_session_maker() as session:
             birthday_this_year = await cast_birthday_to_current_year(Users.birthday)
