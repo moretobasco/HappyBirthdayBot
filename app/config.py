@@ -15,9 +15,18 @@ class Settings(BaseSettings):
     SMTP_USER: str
     SMTP_PASS: str
 
+    RABBITMQ_DEFAULT_HOST: str
+    RABBITMQ_DEFAULT_PORT: int
+    RABBITMQ_DEFAULT_USER: str
+    RABBITMQ_DEFAULT_PASS: str
+
     @property
-    def DATABASE_URL(self):
+    def DATABASE_URL(self) -> str:
         return f'postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}'
+
+    @property
+    def RABBITMQ_URL(self) -> str:
+        return f"amqp://{self.RABBITMQ_DEFAULT_USER}:{self.RABBITMQ_DEFAULT_PASS}@{self.RABBITMQ_DEFAULT_HOST}:{self.RABBITMQ_DEFAULT_PORT}"
 
     model_config = SettingsConfigDict(env_file=".env")
 
