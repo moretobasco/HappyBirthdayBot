@@ -2,9 +2,10 @@
 import asyncio
 
 from taskiq_aio_pika import AioPikaBroker
+from taskiq_redis import RedisAsyncResultBackend
 from app.config import settings
 
-broker = AioPikaBroker(settings.RABBITMQ_URL)
+broker = AioPikaBroker(settings.RABBITMQ_URL).with_result_backend(RedisAsyncResultBackend('redis://localhost'))
 
 
 @broker.task

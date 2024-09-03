@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     SMTP_USER: str
     SMTP_PASS: str
 
+    REDIS_HOST: str
+    REDIS_PORT: int
+
     RABBITMQ_DEFAULT_HOST: str
     RABBITMQ_DEFAULT_PORT: int
     RABBITMQ_DEFAULT_USER: str

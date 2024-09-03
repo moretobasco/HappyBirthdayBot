@@ -1,6 +1,13 @@
 version: '3.8'
 
 services:
+  redis:
+    image: redis:7
+    container_name: happyBD_redis
+    ports:
+      - 6379:6379
+
+
   rabbitmq:
     image: "rabbitmq:management"  # используем образ с включенным управлением
     hostname: "rabbitmqhost"
@@ -14,3 +21,6 @@ services:
       - .env
     environment:
       - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit disk_free_limit 1431655766  # 1.3 Gib
+    depends_on:
+      - redis
+
