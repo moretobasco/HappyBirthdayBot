@@ -1,16 +1,10 @@
-# broker.py
 import asyncio
 
 from taskiq_aio_pika import AioPikaBroker
 from taskiq_redis import RedisAsyncResultBackend
 from app.config import settings
-
-broker = AioPikaBroker(settings.RABBITMQ_URL).with_result_backend(RedisAsyncResultBackend('redis://localhost'))
-
-
-@broker.task
-async def add_one(value: int) -> int:
-    return value + 1
+from app.tasks import add_one
+from app.tasks import broker
 
 
 async def main() -> None:
@@ -29,3 +23,5 @@ async def main() -> None:
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+# asyncio.get_event_loop().run_until_complete(main())
