@@ -1,10 +1,28 @@
 from taskiq_aio_pika import AioPikaBroker
-from taskiq_redis import RedisAsyncResultBackend
 from app.config import settings
+from taskiq.schedule_sources import LabelScheduleSource
+from taskiq import TaskiqScheduler, BrokerMessage
+from app.subscription.dao import SubscriptionsDAO
 
-broker = AioPikaBroker(settings.RABBITMQ_URL).with_result_backend(RedisAsyncResultBackend('redis://localhost'))
+broker = AioPikaBroker(settings.RABBITMQ_URL)
+
+scheduler = TaskiqScheduler(
+    broker=broker,
+    sources=[LabelScheduleSource(broker)],
+)
 
 
-@broker.task
-async def add_one(value: int) -> int:
-    return value + 1
+@broker.task(schedule=[{'cron': '1 * * * *'}])
+async def add_one():
+    print('Я начал работать')
+    result = 'Hello!'
+    message = BrokerMessage(
+        task_name='add_one',
+        task_id='unique-task-id',
+        message=result.encode('utf-8'),
+        labels={'priority': 'high'}
+    )
+    await broker.kick(message)
+
+
+
