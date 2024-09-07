@@ -4,8 +4,24 @@ from fastapi import FastAPI, Request
 from taskiq import InMemoryBroker
 from app.users.router import router as users_router
 from app.subscription.router import router as subscription_router
+from app.tasks import broker, add_one
 
 app = FastAPI()
+
+app.include_router(users_router)
+app.include_router(subscription_router)
+
+@app.on_event("startup")
+async def app_startup():
+    if not broker.is_worker_process:
+        await broker.startup()
+        await add_one.kiq()
+
+
+@app.on_event("shutdown")
+async def app_shutdown():
+    if not broker.is_worker_process:
+        await broker.shutdown()
 
 # taskiq = InMemoryBroker()
 #
@@ -25,5 +41,4 @@ app = FastAPI()
 #     await send_birthday_notification.kiq(user_id=user_id, user_agent=user_agent)
 
 
-app.include_router(users_router)
-app.include_router(subscription_router)
+
