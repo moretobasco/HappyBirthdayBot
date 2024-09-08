@@ -1,10 +1,7 @@
-import asyncio
-
-from fastapi import FastAPI, Request
-from taskiq import InMemoryBroker
+from fastapi import FastAPI
 from app.users.router import router as users_router
 from app.subscription.router import router as subscription_router
-from app.tasks import broker, add_one
+from app.tasks.tasks import broker, add_one
 
 app = FastAPI()
 

@@ -4,8 +4,8 @@ import base64
 from taskiq import BrokerMessage
 from taskiq_aio_pika import AioPikaBroker
 from app.config import settings
-# from app.tasks import add_one
-# from app.tasks import broker
+from app.tasks.taskiq_app import broker
+from app.tasks.tasks import send_message
 
 
 # async def main() -> None:
@@ -22,15 +22,15 @@ from app.config import settings
 #     await broker.shutdown()
 
 
-# async def main() -> None:
-#     await broker.startup()
-#     await add_one.kiq()
-#     print('я отправил задачу')
-#     await broker.shutdown()
-#
-#
-# if __name__ == "__main__":
-#     asyncio.run(main())
+async def main() -> None:
+    await broker.startup()
+    await send_message.kiq()
+    print('я отправил задачу')
+    await broker.shutdown()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
 
 # asyncio.get_event_loop().run_until_complete(main())
 
