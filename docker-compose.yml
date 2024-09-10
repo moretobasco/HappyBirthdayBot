@@ -15,8 +15,8 @@ services:
     ports:
       - "5672:5672"  # порт для AMQP
       - "15672:15672"  # порт для управляющего интерфейса
-    volumes:
-      - ./rabbitmq_data:/var/lib/rabbitmq
+#    volumes:
+#      - ./rabbitmq_data:/var/lib/rabbitmq
     env_file:
       - .env
     environment:
