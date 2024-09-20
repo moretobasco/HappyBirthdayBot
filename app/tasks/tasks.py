@@ -5,6 +5,7 @@ from taskiq.schedule_sources import LabelScheduleSource
 from taskiq import TaskiqScheduler
 from app.tasks.taskiq_app import broker
 from datetime import datetime
+from app.subscription.dao import SubscriptionsDAO
 
 scheduler = TaskiqScheduler(
     broker=broker,
@@ -18,12 +19,11 @@ async def send_message():
     exchange = await channel.declare_exchange(name='happybirthday_exchange', type='direct')
     queue = await channel.declare_queue(name='happybirthday_queue')
     await queue.bind(exchange=exchange, routing_key='hbd')
-    # message_list = ['Hello-1', 'Hello-2', 'Hello-3']
-    # time_list = [datetime.now().strftime('%H:%M:%S') for _ in range(3)]
+    messages = await SubscriptionsDAO.get_subs_v2()
     tasks = []
-    for _ in range(3):
-        time = datetime.now().strftime('%H:%M:%S')
-        message = aio_pika.Message(body=time.encode())
+    for _ in messages:
+        # time = datetime.now().strftime('%H:%M:%S')
+        message = aio_pika.Message(body=messages.encode())
         await asyncio.sleep(5)
         tasks.append(exchange.publish(message, routing_key='hbd'))
     # for m in time_list:
