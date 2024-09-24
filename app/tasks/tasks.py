@@ -22,13 +22,8 @@ async def send_message():
     messages = await SubscriptionsDAO.get_subs_v2()
     tasks = []
     for _ in messages:
-        # time = datetime.now().strftime('%H:%M:%S')
         message = aio_pika.Message(body=messages.encode())
-        # await asyncio.sleep(5)
         tasks.append(exchange.publish(message, routing_key='hbd'))
-    # for m in time_list:
-    #     message = aio_pika.Message(body=m.encode())
-    #     tasks.append(exchange.publish(message, routing_key='hbd'))
     await asyncio.gather(*tasks)
     await connection.close()
 
