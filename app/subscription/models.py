@@ -1,6 +1,5 @@
 from sqlalchemy.orm import mapped_column, Mapped
 from sqlalchemy.dialects.postgresql import JSONB
-from datetime import date, timedelta
 from app.database import Base
 
 
