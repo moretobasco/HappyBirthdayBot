@@ -5,7 +5,7 @@ from app.dao.base import BaseDAO
 from app.database import async_session_maker
 from app.subscription.models import Subscriptions
 from app.users.models import Users
-from sqlalchemy import select, func, Interval, cast, String, text, Date, column, VARCHAR, Select, Insert, and_, or_
+from sqlalchemy import select, func, cast, or_
 from sqlalchemy.dialects.postgresql import INTERVAL, JSONB
 from app.users.dao import cast_birthday_to_current_year
 
