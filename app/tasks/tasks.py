@@ -20,13 +20,15 @@ async def send_message():
     queue = await channel.declare_queue(name='happybirthday_queue')
     await queue.bind(exchange=exchange, routing_key='hbd')
     messages = await SubscriptionsDAO.get_subs_v2()
-    tasks = []
-    for _ in messages:
-        message = aio_pika.Message(body=messages.encode())
-        tasks.append(exchange.publish(message, routing_key='hbd'))
-    await asyncio.gather(*tasks)
-    await connection.close()
-
+    if messages:
+        tasks = []
+        for _ in messages:
+            message = aio_pika.Message(body=messages.encode())
+            tasks.append(exchange.publish(message, routing_key='hbd'))
+        await asyncio.gather(*tasks)
+        await connection.close()
+    else:
+        return None
 
 @broker.task(schedule=[{'cron': '* * * * *'}])
 async def publish():

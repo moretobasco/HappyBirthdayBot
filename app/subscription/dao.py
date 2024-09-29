@@ -40,11 +40,11 @@ class SubscriptionsDAO(BaseDAO):
             result = await session.execute(query)
             return result.mappings().all()
 
-# async def main():
-#     task = asyncio.create_task(SubscriptionsDAO.get_subs_v2())
-#     await asyncio.gather(task)
-#     # coro1 = UsersDAO.test()
-#     # await coro1
-#
-#
-# asyncio.get_event_loop().run_until_complete(main())
+async def main():
+    task = asyncio.create_task(SubscriptionsDAO.get_subs_v2())
+    await asyncio.gather(task)
+    # coro1 = UsersDAO.test()
+    # await coro1
+
+
+asyncio.get_event_loop().run_until_complete(main())
