@@ -6,6 +6,8 @@ from taskiq import TaskiqScheduler
 from app.tasks.taskiq_app import broker
 from datetime import datetime
 from app.subscription.dao import SubscriptionsDAO
+import json
+from app.subscription.schemas import SSubscriptions
 
 scheduler = TaskiqScheduler(
     broker=broker,
@@ -22,8 +24,8 @@ async def send_message():
     messages = await SubscriptionsDAO.get_subs_v2()
     if messages:
         tasks = []
-        for _ in messages:
-            message = aio_pika.Message(body=messages.encode())
+        for message in messages:
+            message = aio_pika.Message(body=message.encode())
             tasks.append(exchange.publish(message, routing_key='hbd'))
         await asyncio.gather(*tasks)
         await connection.close()
