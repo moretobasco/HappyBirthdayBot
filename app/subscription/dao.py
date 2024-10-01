@@ -8,6 +8,7 @@ from app.users.models import Users
 from sqlalchemy import select, func, cast, or_
 from sqlalchemy.dialects.postgresql import INTERVAL, JSONB
 from app.users.dao import cast_birthday_to_current_year
+from pprint import pprint
 
 
 class SubscriptionsDAO(BaseDAO):
@@ -38,14 +39,16 @@ class SubscriptionsDAO(BaseDAO):
                 )
             )
             result = await session.execute(query)
-            # print(result.mappings().all())
-            return result.mappings().all()
+            # pprint(result.mappings().all())
+            # pprint(type(result.mappings().all()))
+            # return result.mappings().all()
+            print(type(result.mappings().all()[0]))
 
-# async def main():
-#     task = asyncio.create_task(SubscriptionsDAO.get_subs_v2())
-#     await asyncio.gather(task)
-#     # coro1 = UsersDAO.test()
-#     # await coro1
-#
-#
-# asyncio.get_event_loop().run_until_complete(main())
+async def main():
+    task = asyncio.create_task(SubscriptionsDAO.get_subs_v2())
+    await asyncio.gather(task)
+    # coro1 = UsersDAO.test()
+    # await coro1
+
+
+asyncio.get_event_loop().run_until_complete(main())
