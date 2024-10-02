@@ -5,7 +5,6 @@ from app.dao.base import BaseDAO
 from app.database import async_session_maker
 from app.users.models import Users
 from sqlalchemy import select, func, Interval, cast, String, text, Date, column, VARCHAR, Select, Insert, and_
-from sqlalchemy.dialects.postgresql import INTERVAL
 
 
 async def cast_birthday_to_current_year(birthday: date):

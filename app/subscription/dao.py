@@ -1,6 +1,5 @@
 import asyncio
 
-
 from app.dao.base import BaseDAO
 from app.database import async_session_maker
 from app.subscription.models import Subscriptions
@@ -33,9 +32,9 @@ class SubscriptionsDAO(BaseDAO):
                 Users.__table__.columns
             ).join(Subscriptions, Users.user_id == Subscriptions.user_sub_id).where(
                 or_(
-                Subscriptions.notify_before_days.contains(cast(func.to_jsonb(
-                    birthday_this_year - func.current_date()), JSONB)),
-                Subscriptions.notify_on_day == True
+                    Subscriptions.notify_before_days.contains(cast(func.to_jsonb(
+                        birthday_this_year - func.current_date()), JSONB)),
+                    Subscriptions.notify_on_day == True
                 )
             )
             result = await session.execute(query)
@@ -43,6 +42,7 @@ class SubscriptionsDAO(BaseDAO):
             # pprint(type(result.mappings().all()))
             # return result.mappings().all()
             print(type(result.mappings().all()[0]))
+
 
 async def main():
     task = asyncio.create_task(SubscriptionsDAO.get_subs_v2())
