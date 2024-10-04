@@ -41,12 +41,12 @@ class SubscriptionsDAO(BaseDAO):
             result = await session.execute(query)
             return result.mappings().all()
 
-async def test_ser_model():
-    messages = await SubscriptionsDAO.get_subs_v2()
-    validated_messages = [SSubscriptions.model_validate(message) for message in messages]
-    for message in validated_messages:
-        print(message.model_dump_json())
-        print(type(message.model_dump()))
+# async def test_ser_model():
+#     messages = await SubscriptionsDAO.get_subs_v2()
+#     validated_messages = [SSubscriptions.model_validate(message) for message in messages]
+#     for message in validated_messages:
+#         print(message.model_dump_json())
+#         print(type(message.model_dump()))
 
 
 # async def main():
