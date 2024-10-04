@@ -25,7 +25,8 @@ async def send_message():
     if messages:
         tasks = []
         for message in messages:
-            message = aio_pika.Message(body=message.encode())
+            serialized_message = SSubscriptions.model_validate(message).model_dump_json()
+            message = aio_pika.Message(body=serialized_message.encode())
             tasks.append(exchange.publish(message, routing_key='hbd'))
         await asyncio.gather(*tasks)
         await connection.close()

@@ -8,6 +8,7 @@ from sqlalchemy import select, func, cast, or_
 from sqlalchemy.dialects.postgresql import INTERVAL, JSONB
 from app.users.dao import cast_birthday_to_current_year
 from pprint import pprint
+from app.subscription.schemas import SSubscriptions
 
 
 class SubscriptionsDAO(BaseDAO):
@@ -38,17 +39,22 @@ class SubscriptionsDAO(BaseDAO):
                 )
             )
             result = await session.execute(query)
-            # pprint(result.mappings().all())
-            # pprint(type(result.mappings().all()))
-            # return result.mappings().all()
-            print(type(result.mappings().all()[0]))
+            return result.mappings().all()
+
+async def test_ser_model():
+    messages = await SubscriptionsDAO.get_subs_v2()
+    validated_messages = [SSubscriptions.model_validate(message) for message in messages]
+    for message in validated_messages:
+        print(message.model_dump_json())
+        print(type(message.model_dump()))
 
 
-async def main():
-    task = asyncio.create_task(SubscriptionsDAO.get_subs_v2())
-    await asyncio.gather(task)
-    # coro1 = UsersDAO.test()
-    # await coro1
-
-
-asyncio.get_event_loop().run_until_complete(main())
+# async def main():
+#     # task = asyncio.create_task(SubscriptionsDAO.get_subs_v2())
+#     task = asyncio.create_task(test_ser_model())
+#     await asyncio.gather(task)
+#     # coro1 = UsersDAO.test()
+#     # await coro1
+#
+#
+# asyncio.get_event_loop().run_until_complete(main())
