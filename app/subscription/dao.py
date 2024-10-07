@@ -4,7 +4,7 @@ from app.dao.base import BaseDAO
 from app.database import async_session_maker
 from app.subscription.models import Subscriptions
 from app.users.models import Users
-from sqlalchemy import select, func, cast, or_
+from sqlalchemy import select, func, cast, or_, Insert, insert
 from sqlalchemy.dialects.postgresql import INTERVAL, JSONB
 from app.users.dao import cast_birthday_to_current_year
 from pprint import pprint
@@ -40,6 +40,22 @@ class SubscriptionsDAO(BaseDAO):
             )
             result = await session.execute(query)
             return result.mappings().all()
+
+    @classmethod
+    async def add_subscription(cls, user_id, user_sub_id, notify_before_days, notify_on_day):
+        async with async_session_maker() as session:
+            add_subscription = insert(Subscriptions).values(
+                user_id=user_id,
+                user_sub_id=user_sub_id,
+                notify_before_days=notify_before_days,
+                notify_on_day=notify_on_day
+            )
+            new_subscription = await session.execute(add_subscription)
+            await session.commit()
+            return new_subscription
+
+
+
 
 # async def test_ser_model():
 #     messages = await SubscriptionsDAO.get_subs_v2()

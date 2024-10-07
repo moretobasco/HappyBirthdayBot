@@ -34,6 +34,7 @@ async def send_message():
     else:
         return None
 
+
 @broker.task(schedule=[{'cron': '* * * * *'}])
 async def publish():
     await send_message()
