@@ -1,4 +1,4 @@
-from sqlalchemy.orm import mapped_column, Mapped
+from sqlalchemy.orm import mapped_column, Mapped, relationship
 from datetime import date, timedelta
 from sqlalchemy import Date, Computed, func, cast, VARCHAR
 from sqlalchemy import Interval
@@ -13,11 +13,17 @@ from app.database import Base
 
 
 class Users(Base):
-    __tablename__ = 'users'
+    __tablename__ = 'Users'
 
     user_id: Mapped[int] = mapped_column(primary_key=True)
     user_role: Mapped[Optional[str]]
     user_name: Mapped[str]
     birthday: Mapped[date]
     email: Mapped[Optional[str]]
-    telegram: Mapped[Optional[int]]
+    telegram: Mapped[Optional[int]] = mapped_column(unique=True)
+
+    subscriber_id: Mapped['Subscriptions'] = relationship(back_populates='subscriber_id')
+    subscribed_to_id: Mapped['Subscriptions'] = relationship(back_populates='subscribed_to_id')
+
+
+
