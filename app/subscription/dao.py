@@ -54,6 +54,11 @@ class SubscriptionsDAO(BaseDAO):
             await session.commit()
             return new_subscription
 
+    @classmethod
+    async def subscribe_all_users(cls):
+        async with async_session_maker() as session:
+            all_users = select()
+
 
 
 
