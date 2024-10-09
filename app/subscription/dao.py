@@ -9,6 +9,9 @@ from sqlalchemy.dialects.postgresql import INTERVAL, JSONB
 from app.users.dao import cast_birthday_to_current_year
 from pprint import pprint
 from app.subscription.schemas import SSubscriptions
+from sqlalchemy.exc import IntegrityError
+from asyncpg.exceptions import UniqueViolationError, ForeignKeyViolationError
+from app.exceptions import DublicateSubscriptionError, UserNotFoundError
 
 
 class SubscriptionsDAO(BaseDAO):
@@ -43,24 +46,30 @@ class SubscriptionsDAO(BaseDAO):
 
     @classmethod
     async def add_subscription(cls, user_id, user_sub_id, notify_before_days, notify_on_day):
-        async with async_session_maker() as session:
-            add_subscription = insert(Subscriptions).values(
-                user_id=user_id,
-                user_sub_id=user_sub_id,
-                notify_before_days=notify_before_days,
-                notify_on_day=notify_on_day
-            )
-            new_subscription = await session.execute(add_subscription)
-            await session.commit()
-            return new_subscription
+        try:
+            async with async_session_maker() as session:
+                add_subscription = insert(Subscriptions).values(
+                    user_id=user_id,
+                    user_sub_id=user_sub_id,
+                    notify_before_days=notify_before_days,
+                    notify_on_day=notify_on_day
+                )
+                new_subscription = await session.execute(add_subscription)
+                await session.commit()
+                return new_subscription
+        except IntegrityError as e:
+            if e.orig.pgcode == UniqueViolationError.sqlstate:
+                return DublicateSubscriptionError
+            elif e.orig.sqlstate == ForeignKeyViolationError.sqlstate:
+                return UserNotFoundError
+
+
+
 
     @classmethod
     async def subscribe_all_users(cls):
         async with async_session_maker() as session:
             all_users = select()
-
-
-
 
 # async def test_ser_model():
 #     messages = await SubscriptionsDAO.get_subs_v2()
@@ -71,8 +80,12 @@ class SubscriptionsDAO(BaseDAO):
 
 
 # async def main():
-#     # task = asyncio.create_task(SubscriptionsDAO.get_subs_v2())
-#     task = asyncio.create_task(test_ser_model())
+#     task = asyncio.create_task(SubscriptionsDAO.add_subscription(
+#         user_id=1,
+#         user_sub_id=2,
+#         notify_on_day=True,
+#         notify_before_days=[1]
+#     ))
 #     await asyncio.gather(task)
 #     # coro1 = UsersDAO.test()
 #     # await coro1

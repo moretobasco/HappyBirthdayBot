@@ -1,6 +1,8 @@
 from fastapi import APIRouter
 from app.subscription.dao import SubscriptionsDAO
 from app.subscription.schemas import SSubscriptions
+from app.exceptions import DublicateSubscriptionError, UserNotFoundError
+from app.exceptions import UserIsNotFoundException, DublicatedSubscriptionException
 
 router = APIRouter(
     prefix='/Subscriptions',
@@ -20,7 +22,12 @@ async def subscribe(
         notify_on_day: bool
 ):
     subscription = await SubscriptionsDAO.add_subscription(user_id, user_sub_id, notify_before_days, notify_on_day)
+    if subscription == DublicateSubscriptionError:
+        raise DublicatedSubscriptionException
+    elif subscription == UserNotFoundError:
+        raise UserIsNotFoundException
     return subscription
+
 
 
 

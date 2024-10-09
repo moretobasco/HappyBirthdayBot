@@ -13,7 +13,7 @@ from app.database import Base
 
 
 class Users(Base):
-    __tablename__ = 'Users'
+    __tablename__ = 'users'
 
     user_id: Mapped[int] = mapped_column(primary_key=True)
     user_role: Mapped[Optional[str]]
@@ -22,8 +22,8 @@ class Users(Base):
     email: Mapped[Optional[str]]
     telegram: Mapped[Optional[int]] = mapped_column(unique=True)
 
-    subscriber_id: Mapped['Subscriptions'] = relationship(back_populates='subscriber_id')
-    subscribed_to_id: Mapped['Subscriptions'] = relationship(back_populates='subscribed_to_id')
+    subscriber_id: Mapped['subscriptions'] = relationship(back_populates='subscriber_id')
+    subscribed_to_id: Mapped['subscriptions'] = relationship(back_populates='subscribed_to_id')
 
 
 
