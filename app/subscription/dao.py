@@ -67,23 +67,28 @@ class SubscriptionsDAO(BaseDAO):
 
     @classmethod
     async def subscribe_all_users(cls, user_id, notify_before_days):
-        async with async_session_maker() as session:
-            u1 = aliased(Users)
-            u2 = aliased(Users)
+        try:
+            async with async_session_maker() as session:
+                u1 = aliased(Users)
+                u2 = aliased(Users)
 
-            all_users = select(
-                u1.user_id.label('user_id'),
-                u2.user_id.label('user_sub_id'),
-                cast(literal(notify_before_days), JSONB),
-                literal(True)
-            ).select_from(u1).join(u2, u1.user_id != u2.user_id).where(u1.user_id == user_id)
+                all_users = select(
+                    u1.user_id.label('user_id'),
+                    u2.user_id.label('user_sub_id'),
+                    cast(literal(notify_before_days), JSONB),
+                    literal(True)
+                ).select_from(u1).join(u2, u1.user_id != u2.user_id).where(u1.user_id == user_id)
 
-            add_subscriptions = insert(Subscriptions).from_select(
-                ['user_id', 'user_sub_id', 'notify_before_days', 'notify_on_day'], all_users
-            )
+                add_subscriptions = insert(Subscriptions).from_select(
+                    ['user_id', 'user_sub_id', 'notify_before_days', 'notify_on_day'], all_users
+                )
 
-            await session.execute(add_subscriptions)
-            await session.commit()
+                await session.execute(add_subscriptions)
+                await session.commit()
+
+        except IntegrityError as e:
+            if e.orig.pgcode == UniqueViolationError.sqlstate:
+                return DublicateSubscriptionError
 
 
 # async def test_ser_model():

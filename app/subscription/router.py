@@ -34,6 +34,8 @@ async def subscribe(
 async def subscribe_all_users(user_id: int, notify_before_days: list[int]):
     notify_before_days = json.dumps(notify_before_days)
     subscriptions = await SubscriptionsDAO.subscribe_all_users(user_id, notify_before_days)
+    if subscriptions == DublicateSubscriptionError:
+        raise DublicatedSubscriptionException
     return subscriptions
 
 
