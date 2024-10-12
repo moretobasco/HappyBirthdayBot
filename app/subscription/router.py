@@ -10,9 +10,12 @@ router = APIRouter(
 )
 
 
-@router.get('/getsub')
-async def get_subscriptions():
-    return await SubscriptionsDAO.get_subs_v2()
+@router.get('/find_subscriptions')
+async def get_subscriptions(
+        user_id: int,
+        user_sub_id: int,
+):
+    return await SubscriptionsDAO.find_all(user_id=user_id, user_sub_id=user_sub_id)
 
 
 @router.post('/subscribe')
@@ -31,7 +34,10 @@ async def subscribe(
 
 
 @router.post('/subscribe_all_users')
-async def subscribe_all_users(user_id: int, notify_before_days: list[int]):
+async def subscribe_all_users(
+        user_id: int,
+        notify_before_days: list[int]
+):
     notify_before_days = json.dumps(notify_before_days)
     subscriptions = await SubscriptionsDAO.subscribe_all_users(user_id, notify_before_days)
     if subscriptions == DublicateSubscriptionError:
@@ -39,6 +45,18 @@ async def subscribe_all_users(user_id: int, notify_before_days: list[int]):
     return subscriptions
 
 
+@router.patch('/update_subscription')
+async def update_subscription(
+        user_id: int, sub_user_id: int,
+        notify_before_days: list[int],
+        notify_on_day: bool
+):
+    return await SubscriptionsDAO.update_subscription(user_id, sub_user_id, notify_before_days, notify_on_day)
 
 
-
+@router.post('/delete_subscription')
+async def delete_my_subscription(
+        user_id: int,
+        user_sub_id: int
+):
+    return await SubscriptionsDAO.delete_subscription(user_id, user_sub_id)

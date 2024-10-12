@@ -7,13 +7,7 @@ from app.users.models import Users
 from sqlalchemy import select, func, Interval, cast, String, text, Date, column, VARCHAR, Select, Insert, and_
 
 
-async def cast_birthday_to_current_year(birthday: date):
-    query = cast(func.concat(
-        cast(func.extract('year', func.current_date()), VARCHAR),
-        func.lpad(cast(func.extract('month', birthday), VARCHAR), 2, "0"),
-        func.lpad(cast(func.extract('day', birthday), VARCHAR), 2, "0")),
-        Date)
-    return query
+
 
 
 class UsersDAO(BaseDAO):
@@ -37,7 +31,7 @@ class UsersDAO(BaseDAO):
             return result.mappings().all()
 
     @classmethod
-    async def birthdays_in_horizon_v3(cls, duration):
+    async def birthdays_in_horizon(cls, duration):
         """
         SELECT *
         FROM users
@@ -59,7 +53,7 @@ class UsersDAO(BaseDAO):
                 lpad(CAST(EXTRACT(day FROM users.birthday) AS VARCHAR), 2, '0')) AS DATE) - CURRENT_DATE
         """
         async with (async_session_maker() as session):
-            birthday_this_year = await cast_birthday_to_current_year(cls.model.birthday)
+            birthday_this_year = await BaseDAO.cast_birthday_to_current_year(cls.model.birthday)
             query = select(
                 cls.model.__table__.columns
             ).where(

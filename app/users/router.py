@@ -8,7 +8,7 @@ router = APIRouter(
 
 @router.get('/in_horizon/{horizon}')
 async def get_birthdays(horizon: int):
-    return await UsersDAO.birthdays_in_horizon_v2(duration=horizon)
+    return await UsersDAO.birthdays_in_horizon(duration=horizon)
 
 
 @router.get('/this_month')

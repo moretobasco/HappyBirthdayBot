@@ -22,7 +22,7 @@ class Users(Base):
     birthday: Mapped[date]
     email: Mapped[Optional[str]]
     telegram: Mapped[Optional[int]] = mapped_column(unique=True)
-    whatsapp: Mapped[Optional[int]] = mapped_column(unique=True)
+    # whatsapp: Mapped[Optional[int]] = mapped_column(unique=True)
 
     subscriber_id: Mapped['Subscriptions'] = relationship(foreign_keys=Subscriptions.user_id, back_populates='subscriber_id')
     subscribed_to_id: Mapped['Subscriptions'] = relationship(foreign_keys=Subscriptions.user_sub_id, back_populates='subscribed_to_id')

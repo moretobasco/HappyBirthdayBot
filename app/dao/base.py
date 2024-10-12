@@ -2,6 +2,7 @@ from datetime import date
 
 from app.database import async_session_maker
 from sqlalchemy import select
+from sqlalchemy import select, func, Interval, cast, String, text, Date, column, VARCHAR, Select, Insert, and_
 
 
 class BaseDAO:
@@ -21,4 +22,11 @@ class BaseDAO:
             result = await session.execute(query)
             return result.mappings().one_or_none()
 
-
+    @classmethod
+    async def cast_birthday_to_current_year(cls, birthday: date):
+        query = cast(func.concat(
+            cast(func.extract('year', func.current_date()), VARCHAR),
+            func.lpad(cast(func.extract('month', birthday), VARCHAR), 2, "0"),
+            func.lpad(cast(func.extract('day', birthday), VARCHAR), 2, "0")),
+            Date)
+        return query

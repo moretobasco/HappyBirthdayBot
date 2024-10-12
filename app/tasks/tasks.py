@@ -21,7 +21,7 @@ async def send_message():
     exchange = await channel.declare_exchange(name='happybirthday_exchange', type='direct')
     queue = await channel.declare_queue(name='happybirthday_queue')
     await queue.bind(exchange=exchange, routing_key='hbd')
-    messages = await SubscriptionsDAO.get_subs_v2()
+    messages = await SubscriptionsDAO.get_subscriptions_for_messages()
     if messages:
         tasks = []
         for message in messages:

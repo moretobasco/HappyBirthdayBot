@@ -4,10 +4,9 @@ from app.dao.base import BaseDAO
 from app.database import async_session_maker
 from app.subscription.models import Subscriptions
 from app.users.models import Users
-from sqlalchemy import select, func, cast, or_, Insert, insert, literal
+from sqlalchemy import select, func, cast, or_, Insert, insert, literal, update, delete
 from sqlalchemy.orm import aliased
 from sqlalchemy.dialects.postgresql import INTERVAL, JSONB
-from app.users.dao import cast_birthday_to_current_year
 from pprint import pprint
 from app.subscription.schemas import SSubscriptions
 from sqlalchemy.exc import IntegrityError
@@ -20,7 +19,7 @@ class SubscriptionsDAO(BaseDAO):
     model = Subscriptions
 
     @classmethod
-    async def get_subs_v2(cls):
+    async def get_subscriptions_for_messages(cls):
         """
         SELECT *
         FROM subscriptions
@@ -32,7 +31,7 @@ class SubscriptionsDAO(BaseDAO):
         OR subscriptions.notify_on_day = TRUE
         """
         async with async_session_maker() as session:
-            birthday_this_year = await cast_birthday_to_current_year(Users.birthday)
+            birthday_this_year = await BaseDAO.cast_birthday_to_current_year(Users.birthday)
             query = select(
                 Subscriptions.__table__.columns,
                 Users.__table__.columns
@@ -89,6 +88,26 @@ class SubscriptionsDAO(BaseDAO):
         except IntegrityError as e:
             if e.orig.pgcode == UniqueViolationError.sqlstate:
                 return DublicateSubscriptionError
+
+    @classmethod
+    async def update_subscription(cls, user_id, user_sub_id, notify_before_days, notify_on_day):
+        async with async_session_maker() as session:
+            updated_subscription = update(Subscriptions).filter_by(
+                user_id=user_id, user_sub_id=user_sub_id
+            ).values(notify_before_days=notify_before_days, notify_on_day=notify_on_day).execution_options(
+                synchronize_session='fetch'
+            )
+            await session.execute(updated_subscription)
+            await session.commit()
+
+    @classmethod
+    async def delete_subscription(cls, user_id, user_sub_id):
+        async with async_session_maker() as session:
+            deleted_subscription = delete(Subscriptions).filter_by(
+                user_id=user_id, user_sub_id=user_sub_id
+            )
+            await session.execute(deleted_subscription)
+            await session.commit()
 
 
 # async def test_ser_model():
