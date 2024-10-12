@@ -78,10 +78,6 @@ class UsersDAO(BaseDAO):
             await session.execute(query)
             await session.commit()
 
-    @classmethod
-    async def subscribe_all_users(cls, user):
-        async with (async_session_maker() as session):
-            pass
 
 # async def main():
 #     task = asyncio.create_task(UsersDAO.birthdays_in_horizon_v3(5))

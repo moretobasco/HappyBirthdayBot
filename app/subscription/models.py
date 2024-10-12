@@ -15,6 +15,6 @@ class Subscriptions(Base):
 
     __table_args__ = (UniqueConstraint('user_id', 'user_sub_id', name='unique_subscription'),)
 
-    subscriber_id: Mapped['users'] = relationship(back_populates='subscriber_id')
-    subscribed_to_id: Mapped['users'] = relationship(back_populates='subscribed_to_id')
+    subscriber_id: Mapped['Users'] = relationship(foreign_keys=user_id, back_populates='subscriber_id')
+    subscribed_to_id: Mapped['Users'] = relationship(foreign_keys=user_sub_id, back_populates='subscribed_to_id')
 

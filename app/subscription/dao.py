@@ -4,7 +4,8 @@ from app.dao.base import BaseDAO
 from app.database import async_session_maker
 from app.subscription.models import Subscriptions
 from app.users.models import Users
-from sqlalchemy import select, func, cast, or_, Insert, insert
+from sqlalchemy import select, func, cast, or_, Insert, insert, literal
+from sqlalchemy.orm import aliased
 from sqlalchemy.dialects.postgresql import INTERVAL, JSONB
 from app.users.dao import cast_birthday_to_current_year
 from pprint import pprint
@@ -12,6 +13,7 @@ from app.subscription.schemas import SSubscriptions
 from sqlalchemy.exc import IntegrityError
 from asyncpg.exceptions import UniqueViolationError, ForeignKeyViolationError
 from app.exceptions import DublicateSubscriptionError, UserNotFoundError
+from pprint import pprint
 
 
 class SubscriptionsDAO(BaseDAO):
@@ -63,13 +65,26 @@ class SubscriptionsDAO(BaseDAO):
             elif e.orig.sqlstate == ForeignKeyViolationError.sqlstate:
                 return UserNotFoundError
 
-
-
-
     @classmethod
-    async def subscribe_all_users(cls):
+    async def subscribe_all_users(cls, user_id, notify_before_days):
         async with async_session_maker() as session:
-            all_users = select()
+            u1 = aliased(Users)
+            u2 = aliased(Users)
+
+            all_users = select(
+                u1.user_id.label('user_id'),
+                u2.user_id.label('user_sub_id'),
+                cast(literal(notify_before_days), JSONB),
+                literal(True)
+            ).select_from(u1).join(u2, u1.user_id != u2.user_id).where(u1.user_id == user_id)
+
+            add_subscriptions = insert(Subscriptions).from_select(
+                ['user_id', 'user_sub_id', 'notify_before_days', 'notify_on_day'], all_users
+            )
+
+            await session.execute(add_subscriptions)
+            await session.commit()
+
 
 # async def test_ser_model():
 #     messages = await SubscriptionsDAO.get_subs_v2()
@@ -80,15 +95,20 @@ class SubscriptionsDAO(BaseDAO):
 
 
 # async def main():
-#     task = asyncio.create_task(SubscriptionsDAO.add_subscription(
-#         user_id=1,
-#         user_sub_id=2,
-#         notify_on_day=True,
-#         notify_before_days=[1]
+#     # task = asyncio.create_task(SubscriptionsDAO.add_subscription(
+#     #     user_id=1,
+#     #     user_sub_id=2,
+#     #     notify_on_day=True,
+#     #     notify_before_days=[1]
+#     # ))
+#     task = asyncio.create_task(SubscriptionsDAO.subscribe_all_users(
+#         user_id=3, notify_before_days=[3]
 #     ))
 #     await asyncio.gather(task)
 #     # coro1 = UsersDAO.test()
 #     # await coro1
 #
 #
+# #
+# #
 # asyncio.get_event_loop().run_until_complete(main())
