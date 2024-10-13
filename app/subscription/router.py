@@ -6,7 +6,7 @@ from app.exceptions import UserIsNotFoundException, DublicatedSubscriptionExcept
 import json
 
 router = APIRouter(
-    prefix='/Subscriptions',
+    prefix='/subscriptions',
 )
 
 
@@ -45,7 +45,7 @@ async def subscribe_all_users(
     return subscriptions
 
 
-@router.patch('/update_subscription')
+@router.put('/update_subscription/{user_id}/{user_sub_id}')
 async def update_subscription(
         user_id: int, sub_user_id: int,
         notify_before_days: list[int],
@@ -54,9 +54,9 @@ async def update_subscription(
     return await SubscriptionsDAO.update_subscription(user_id, sub_user_id, notify_before_days, notify_on_day)
 
 
-@router.post('/delete_subscription')
+@router.delete('/delete_subscription/{user_id}/{user_sub_id}')
 async def delete_my_subscription(
         user_id: int,
         user_sub_id: int
 ):
-    return await SubscriptionsDAO.delete_subscription(user_id, user_sub_id)
+    return await SubscriptionsDAO.delete_subscription(user_id=user_id, user_sub_id=user_sub_id)
