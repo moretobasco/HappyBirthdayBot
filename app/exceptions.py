@@ -36,6 +36,14 @@ class CorporateEmailNotExists(UserException):
     status_code = status.HTTP_409_CONFLICT
     detail = 'This email is not corporate'
 
+class IncorrectPasswordException(UserException):
+    status_code = status.HTTP_409_CONFLICT
+    detail = 'Incorrect temporary password'
+
+class ExpiredPasswordException(UserException):
+    status_code = status.HTTP_409_CONFLICT
+    detail = 'Your temporary password expired'
+
 
 class AsyncPgErrors(Exception):
     pass

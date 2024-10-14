@@ -73,6 +73,9 @@ class UsersDAO(BaseDAO):
             await session.commit()
 
 
+
+
+
 # async def main():
 #     task = asyncio.create_task(UsersDAO.birthdays_in_horizon_v3(5))
 #     await asyncio.gather(task)

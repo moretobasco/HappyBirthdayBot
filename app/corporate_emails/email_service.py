@@ -6,13 +6,13 @@ import secrets
 from app.config import settings
 
 
-async def generate_secret() -> str:
+def generate_secret() -> str:
     alphabet = string.ascii_letters + string.digits
     password = ''.join(secrets.choice(alphabet) for _ in range(8))
     return password
 
 
-async def write_email(addressee: str, password: str) -> EmailMessage:
+def write_email(addressee: str, password: str) -> EmailMessage:
     email = EmailMessage()
     email['Subject'] = 'Verify your corporate_emails for a Birthdaybot'
     email['From'] = settings.SMTP_USER
@@ -29,7 +29,7 @@ async def write_email(addressee: str, password: str) -> EmailMessage:
     return email
 
 
-async def send_email(email_address: str, password: str) -> None:
-    async with smtplib.SMTP_SSL(settings.SMTP_HOST, settings.SMTP_PORT) as server:
+def send_email(email_address: str, password: str) -> None:
+    with smtplib.SMTP_SSL(settings.SMTP_HOST, settings.SMTP_PORT) as server:
         server.login(settings.SMTP_USER, settings.SMTP_PASS)
         server.send_message(write_email(email_address, password))
