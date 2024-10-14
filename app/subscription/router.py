@@ -45,7 +45,7 @@ async def subscribe_all_users(
     return subscriptions
 
 
-@router.put('/update_subscription/{user_id}/{user_sub_id}')
+@router.put('/update_subscription/{user_id}/{user_sub_id}/')
 async def update_subscription(
         user_id: int, sub_user_id: int,
         notify_before_days: list[int],
