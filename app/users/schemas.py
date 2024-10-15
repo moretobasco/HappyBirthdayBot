@@ -7,10 +7,8 @@ class SUserAuth(BaseModel):
     telegram: int
 
 
-class SUserRegister(BaseModel):
+class SUserRegister(SUserAuth):
     user_role: str
     user_name: str
     birthday: date
-    email: str
-    telegram: int
     permanent_password: str
