@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 from app.subscription.dao import SubscriptionsDAO
-from app.subscription.schemas import SSubscriptions
 from app.exceptions import DublicateSubscriptionError, UserNotFoundError
 from app.exceptions import UserIsNotFoundException, DublicatedSubscriptionException
 import json

@@ -22,6 +22,7 @@ async def get_birthdays(horizon: int):
     return await UsersDAO.birthdays_in_horizon(duration=horizon)
 
 
+
 @router_birthdays.get('/this_month')
 async def get_birthdays():
     return await UsersDAO.birthdays_this_month()
