@@ -60,3 +60,4 @@ async def delete_my_subscription(
         user_sub_id: int
 ):
     return await SubscriptionsDAO.delete_subscription(user_id=user_id, user_sub_id=user_sub_id)
+

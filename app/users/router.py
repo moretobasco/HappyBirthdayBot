@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from app.users.dao import UsersDAO
 from app.users.schemas import SUserAuth, SUserRegister
 from app.exceptions import UserAlreadyExistsException, CorporateEmailNotExists, IncorrectPasswordException, \
@@ -28,14 +28,13 @@ async def get_birthdays():
 
 
 @router_auth.post('/get_temporary_password')
-async def get_temporary_password(user_data: SUserAuth) -> None:
+async def get_temporary_password(user_data: SUserAuth, password=Depends(generate_secret)) -> None:
     existing_user = await UsersDAO.find_one_or_none(telegram=user_data.telegram)
     if existing_user:
         raise UserAlreadyExistsException
     existing_corporate_email = await CorporateEmailDAO.find_one_or_none(email=user_data.email)
     if not existing_corporate_email:
         raise CorporateEmailNotExists
-    password = generate_secret()
     r.set(user_data.email, password)
     r.expire(user_data.email, 300)
     send_email(email_address=user_data.email, password=password)
