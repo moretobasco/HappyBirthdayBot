@@ -9,27 +9,13 @@ from app.redis.redis_app import r
 from app.users.auth import check_existing_user_and_corporate, verify_password
 from app.users.dependencies import get_current_user
 
-router_birthdays = APIRouter(
-    prefix='/birthdays',
-)
-
-router_auth = APIRouter(
+router = APIRouter(
     prefix='/auth',
     tags=['Auth & Users']
 )
 
 
-@router_birthdays.get('/in_horizon/{horizon}')
-async def get_birthdays(horizon: int):
-    return await UsersDAO.birthdays_in_horizon(duration=horizon)
-
-
-@router_birthdays.get('/this_month')
-async def get_birthdays():
-    return await UsersDAO.birthdays_this_month()
-
-
-@router_auth.post('/get_temporary_password')
+@router.post('/get_temporary_password')
 async def get_temporary_password(user_data: SUserAuth, password=Depends(generate_secret)) -> None:
     await check_existing_user_and_corporate(user_data=user_data)
     r.set(user_data.email, password)
@@ -37,7 +23,7 @@ async def get_temporary_password(user_data: SUserAuth, password=Depends(generate
     send_email(email_address=user_data.email, password=password)
 
 
-@router_auth.post('/register')
+@router.post('/register')
 async def register_user(user_data: SUserRegister) -> None:
     await check_existing_user_and_corporate(user_data=user_data)
     await verify_password(user_data=user_data)
@@ -49,6 +35,6 @@ async def register_user(user_data: SUserRegister) -> None:
     )
 
 
-@router_auth.get('/me')
+@router.get('/me')
 async def read_my_user(current_user=Depends(get_current_user)):
     return current_user
