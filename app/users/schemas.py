@@ -8,7 +8,6 @@ class SUserAuth(BaseModel):
 
 
 class SUserRegister(SUserAuth):
-    user_role: str
     user_name: str
     birthday: date
     permanent_password: str

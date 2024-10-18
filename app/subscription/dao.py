@@ -4,7 +4,7 @@ from app.dao.base import BaseDAO
 from app.database import async_session_maker
 from app.subscription.models import Subscriptions
 from app.users.models import Users
-from sqlalchemy import select, func, cast, or_, Insert, insert, literal, update, delete
+from sqlalchemy import select, func, cast, and_, or_, Insert, insert, literal, update, delete
 from sqlalchemy.orm import aliased
 from sqlalchemy.dialects.postgresql import INTERVAL, JSONB
 from pprint import pprint
@@ -28,7 +28,7 @@ class SubscriptionsDAO(BaseDAO):
         CAST(EXTRACT(year FROM CURRENT_DATE) AS VARCHAR),
         lpad(CAST(EXTRACT(month FROM users.birthday) AS VARCHAR), 2, '0'),
         lpad(CAST(EXTRACT(day FROM users.birthday) AS VARCHAR), 2, '0')) AS DATE) - CURRENT_DATE)
-        OR subscriptions.notify_on_day = TRUE
+        OR (CURRENT_DATE = users.birthday AND subscriptions.notify_on_day = TRUE)
         """
         async with async_session_maker() as session:
             birthday_this_year = await BaseDAO.cast_birthday_to_current_year(Users.birthday)
@@ -39,7 +39,9 @@ class SubscriptionsDAO(BaseDAO):
                 or_(
                     Subscriptions.notify_before_days.contains(cast(func.to_jsonb(
                         birthday_this_year - func.current_date()), JSONB)),
-                    Subscriptions.notify_on_day == True
+                    and_(
+                        Users.birthday == func.current_user(),
+                        Subscriptions.notify_on_day == True)
                 )
             )
             result = await session.execute(query)

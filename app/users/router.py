@@ -3,7 +3,7 @@ from app.users.dao import UsersDAO
 from app.users.schemas import SUserAuth, SUserRegister
 from app.exceptions import UserAlreadyExistsException, CorporateEmailNotExists, IncorrectPasswordException, \
     ExpiredPasswordException
-from app.corporate_emails.email_service import send_email, generate_secret
+from app.corporate_emails.email_service import async_send_mail, generate_secret
 from app.corporate_emails.dao import CorporateEmailDAO
 from app.redis.redis_app import r
 from app.users.auth import check_existing_user_and_corporate, verify_password
@@ -20,7 +20,7 @@ async def get_temporary_password(user_data: SUserAuth, password=Depends(generate
     await check_existing_user_and_corporate(user_data=user_data)
     r.set(user_data.email, password)
     r.expire(user_data.email, 300)
-    send_email(email_address=user_data.email, password=password)
+    await async_send_mail(email_address=user_data.email, password=password)
 
 
 @router.post('/register')

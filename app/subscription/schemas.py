@@ -11,9 +11,9 @@ class SSubscriptions(BaseModel):
     user_sub_id: int
     notify_before_days: [list[int]]
     notify_on_day: bool
-    user_role: Optional[str]
-    birthday: Optional[date]
-    email: Optional[str]
-    telegram: Optional[str]
+    user_role: Optional[str] = None
+    birthday: Optional[date] = None
+    email: Optional[str] = None
+    telegram: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True, arbitrary_types_allowed=True)

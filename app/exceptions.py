@@ -64,3 +64,7 @@ class DublicateSubscriptionError(AsyncPgErrors):
 class UserNotFoundError(AsyncPgErrors):
     """Error: user you want to subscribe does not exist"""
     pass
+
+
+class EmailSendError(Exception):
+    """Error: Failed to send message"""
