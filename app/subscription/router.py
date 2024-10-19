@@ -21,7 +21,7 @@ async def get_subscriptions(
     return await SubscriptionsDAO.find_all(user_id=user.user_id, user_sub_id=user_sub_id)
 
 
-@router.post('/subscribe', response_model=SSubscriptions)
+@router.post('/subscribe')
 async def subscribe(
         user_sub_id: int,
         notify_before_days: list[int],
@@ -38,7 +38,6 @@ async def subscribe(
         raise DublicatedSubscriptionException
     elif subscription == UserNotFoundError:
         raise UserIsNotFoundException
-    return subscription
 
 
 @router.post('/subscribe_all_users')
@@ -52,7 +51,6 @@ async def subscribe_all_users(
         notify_before_days=notify_before_days)
     if subscriptions == DublicateSubscriptionError:
         raise DublicatedSubscriptionException
-    return subscriptions
 
 
 @router.put('/update_subscription/{user_id}/{user_sub_id}/')
