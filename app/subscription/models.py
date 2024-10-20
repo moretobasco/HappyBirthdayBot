@@ -18,3 +18,5 @@ class Subscriptions(Base):
     subscriber_id: Mapped['Users'] = relationship(foreign_keys=user_id, back_populates='subscriber_id')
     subscribed_to_id: Mapped['Users'] = relationship(foreign_keys=user_sub_id, back_populates='subscribed_to_id')
 
+    def __str__(self):
+        return f'Subscription #{self.subscription_id}'

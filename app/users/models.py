@@ -4,6 +4,8 @@ from sqlalchemy import Date, Computed, func, cast, VARCHAR
 from sqlalchemy import Interval
 from sqlalchemy.dialects.postgresql import INTERVAL
 from typing import Optional
+
+from app.corporate_emails.models import CorporateEmail
 from app.subscription.models import Subscriptions
 
 from app.database import Base
@@ -25,6 +27,8 @@ class Users(Base):
 
     subscriber_id: Mapped['Subscriptions'] = relationship(foreign_keys=Subscriptions.user_id, back_populates='subscriber_id')
     subscribed_to_id: Mapped['Subscriptions'] = relationship(foreign_keys=Subscriptions.user_sub_id, back_populates='subscribed_to_id')
+    corporate_email: Mapped['CorporateEmail'] = relationship(foreign_keys=CorporateEmail.email, back_populates='corporate_email')
 
-
+    def __str__(self):
+        return f'{self.email}'
 
