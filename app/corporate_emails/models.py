@@ -7,9 +7,14 @@ class CorporateEmail(Base):
     __tablename__ = 'corporatemails'
 
     email_id: Mapped[int] = mapped_column(primary_key=True)
-    email: Mapped[str] = mapped_column(ForeignKey('users.email'))
+    email: Mapped[str] = mapped_column()
 
-    corporate_email: Mapped['Users'] = relationship(foreign_keys=email, back_populates='corporate_email')
+    corporate_email: Mapped['Users'] = relationship(
+        foreign_keys=email,
+        # back_populates='corporate_email',
+        primaryjoin='CorporateEmail.email == Users.email',
+        viewonly=True
+    )
 
     def __str__(self):
         return f'{self.email}'

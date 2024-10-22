@@ -1,10 +1,8 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import EmailStr
 
 
 class Settings(BaseSettings):
-    """
-    не забыть добавить переменные окружения .env в конфигурации IDE
-    """
 
     DB_HOST: str
     DB_PORT: int
@@ -28,6 +26,12 @@ class Settings(BaseSettings):
     ADMIN_TELEGRAM: int
 
     LOCALHOST: str
+
+    SECRET_KEY: str
+    ALGORITHM: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int
+
+    ADMIN_MAIL: str
 
     @property
     def DATABASE_URL(self) -> str:

@@ -52,6 +52,31 @@ class ExpiredPasswordException(UserException):
     detail = 'Your temporary password expired'
 
 
+class IncorrectEmailOrPasswordException(UserException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    detail = 'Wrong email or password'
+
+
+class TokenAbsentException(UserException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    detail = 'Token is absent'
+
+
+class TokenExpiredException(UserException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    detail = 'Token has expired'
+
+
+class IncorrectTokenFormatException(UserException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    detail = 'Wrong token format'
+
+
+class UserIsNotAdmin(UserException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    detail = 'User is not admin'
+
+
 class AsyncPgErrors(Exception):
     pass
 

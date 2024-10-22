@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends
+
+from app.admin.auth import get_password_hash
 from app.users.dao import UsersDAO
 from app.users.schemas import SUserAuth, SUserRegister
 from app.exceptions import UserAlreadyExistsException, CorporateEmailNotExists, IncorrectPasswordException, \
@@ -27,11 +29,13 @@ async def get_temporary_password(user_data: SUserAuth, password=Depends(generate
 async def register_user(user_data: SUserRegister) -> None:
     await check_existing_user_and_corporate(user_data=user_data)
     await verify_password(user_data=user_data)
+    hashed_password = get_password_hash(user_data.admin_password)
     await UsersDAO.add_user(
         user_name=user_data.user_name,
         email=user_data.email,
         birthday=user_data.birthday,
         telegram=user_data.telegram,
+        hashed_password=hashed_password
     )
 
 

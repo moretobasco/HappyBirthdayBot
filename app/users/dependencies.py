@@ -1,8 +1,11 @@
+import jwt
+from jwt.exceptions import PyJWTError, ExpiredSignatureError
 from fastapi import Request, Depends
 from app.users.dao import UsersDAO
-from app.exceptions import UserNotExists
+from app.exceptions import UserNotExists, TokenExpiredException, IncorrectTokenFormatException, UserIsNotAdmin
 from app.users.schemas import SUserRegister
 from app.config import settings
+from app.exceptions import TokenAbsentException
 
 
 def get_telegram_id(request: Request) -> int:
@@ -20,4 +23,7 @@ async def get_current_user(telegram_id=Depends(get_telegram_id)) -> SUserRegiste
     if not user:
         raise UserNotExists
     return user
+
+
+
 

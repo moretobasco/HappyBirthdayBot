@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, EmailStr
 from datetime import date
 
@@ -11,3 +13,9 @@ class SUserRegister(SUserAuth):
     user_name: str
     birthday: date
     permanent_password: str
+    admin_password: Optional[str] = None
+
+
+class SAdminAuth(BaseModel):
+    email: EmailStr
+    password: str
