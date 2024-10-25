@@ -6,7 +6,7 @@ from app.subscription.models import Subscriptions
 from app.users.models import Users
 from sqlalchemy import select, func, cast, and_, or_, Insert, insert, literal, update, delete
 from sqlalchemy.orm import aliased
-from sqlalchemy.dialects.postgresql import INTERVAL, JSONB
+from sqlalchemy.dialects.postgresql import INTERVAL, JSONB, insert as pg_insert
 from pprint import pprint
 from app.subscription.schemas import SSubscriptions
 from sqlalchemy.exc import IntegrityError

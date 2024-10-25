@@ -7,7 +7,7 @@ from app.redis.redis_app import r
 
 
 async def check_existing_user_and_corporate(user_data: SUserAuth) -> None:
-    existing_user = await UsersDAO.find_one_or_none(telegram=user_data.telegram)
+    existing_user = await UsersDAO.find_one_or_none(email=user_data.email)
     if existing_user:
         raise UserAlreadyExistsException
     existing_corporate_email = await CorporateEmailDAO.find_one_or_none(email=user_data.email)

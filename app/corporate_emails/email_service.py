@@ -1,4 +1,6 @@
 import asyncio
+import json
+
 import aiosmtplib
 import smtplib
 from email.message import EmailMessage
@@ -9,6 +11,8 @@ from app.config import settings
 from app.exceptions import EmailSendError
 from string import Template
 import os
+from pprint import pprint
+from collections import OrderedDict
 
 
 def generate_secret() -> str:
@@ -62,3 +66,4 @@ async def async_send_mail(email_address: str, password: str):
         )
     except Exception:
         raise EmailSendError
+

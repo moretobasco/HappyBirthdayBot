@@ -42,7 +42,7 @@ async def subscribe(
 
 @router.post('/subscribe_all_users')
 async def subscribe_all_users(
-        notify_before_days: list[int],
+        notify_before_days: Optional[list[int]] = 0,
         user: Users = Depends(get_current_user)
 ):
     notify_before_days = json.dumps(notify_before_days)
@@ -77,4 +77,3 @@ async def delete_my_subscription(
         user_id=user.user_id,
         user_sub_id=user_sub_id
     )
-

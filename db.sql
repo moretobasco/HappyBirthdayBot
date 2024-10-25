@@ -6,7 +6,7 @@ CREATE TABLE users (
     full_name VARCHAR(100) GENERATED ALWAYS AS (first_name || last_name) STORED
 )
 
-INSERT INTO corporatemails (email, registered) VALUES
+INSERT INTO corporatemails (email) VALUES
 ('Alexey.Lisanskiy@advncd.com', FALSE),
 
 

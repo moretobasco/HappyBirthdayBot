@@ -1,13 +1,14 @@
 import asyncio
 from datetime import datetime, date
 
+from sqlalchemy.orm import aliased
+
 from app.dao.base import BaseDAO
 from app.database import async_session_maker
+from app.subscription.models import Subscriptions
 from app.users.models import Users
-from sqlalchemy import select, func, Interval, cast, String, text, Date, column, VARCHAR, Select, Insert, and_
-
-
-
+from sqlalchemy import select, func, Interval, cast, String, text, Date, column, VARCHAR, Select, Insert, and_, literal
+from sqlalchemy.dialects.postgresql import insert, JSONB
 
 
 class UsersDAO(BaseDAO):
@@ -72,9 +73,43 @@ class UsersDAO(BaseDAO):
             await session.execute(query)
             await session.commit()
 
+    @classmethod
+    async def add_user_and_create_subscriptions(cls, user_name, birthday, email, telegram, hashed_password,
+                                                notify_before_days):
+        async with async_session_maker() as session:
+            # add_user = Insert(Users).values(
+            #     user_name=user_name,
+            #     birthday=birthday,
+            #     email=email,
+            #     telegram=telegram,
+            #     hashed_password=password
+            # )
+            new_user = Users(
+                user_name=user_name,
+                birthday=birthday,
+                email=email,
+                telegram=telegram,
+                hashed_password=hashed_password
+            )
+            session.add(new_user)
+            await session.flush()
 
+            u1 = aliased(Users)
+            u2 = aliased(Users)
 
+            all_users = select(
+                u1.user_id.label('user_id'),
+                u2.user_id.label('user_sub_id'),
+                cast(literal(notify_before_days), JSONB),
+                literal(True)
+            ).select_from(u1).join(u2, u1.user_id != u2.user_id)
 
+            add_subscriptions = insert(Subscriptions).from_select(
+                ['user_id', 'user_sub_id', 'notify_before_days', 'notify_on_day'], all_users
+            ).on_conflict_do_nothing(index_elements=['user_id', 'user_sub_id'])
+
+            await session.execute(add_subscriptions)
+            await session.commit()
 
 # async def main():
 #     task = asyncio.create_task(UsersDAO.birthdays_in_horizon_v3(5))

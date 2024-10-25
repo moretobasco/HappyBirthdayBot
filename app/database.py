@@ -13,7 +13,7 @@ if settings.MODE == 'TEST':
     DATABASE_PARAMS = {'poolclass': NullPool, 'echo': True}
 else:
     DATABASE_URL = settings.DATABASE_URL
-    DATABASE_PARAMS = {}
+    DATABASE_PARAMS = {'echo': True}
 
 engine = create_async_engine(DATABASE_URL, **DATABASE_PARAMS)
 async_session_maker = async_sessionmaker(bind=engine, expire_on_commit=False)

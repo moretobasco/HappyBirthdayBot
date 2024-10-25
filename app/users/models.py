@@ -21,8 +21,8 @@ class Users(Base):
     user_id: Mapped[int] = mapped_column(primary_key=True)
     user_name: Mapped[str]
     birthday: Mapped[date]
-    email: Mapped[Optional[str]] = mapped_column(unique=True)
-    telegram: Mapped[Optional[int]] = mapped_column(unique=True)
+    email: Mapped[str] = mapped_column(unique=True)
+    telegram: Mapped[int] = mapped_column(unique=True)
     hashed_password: Mapped[Optional[str]]
 
     subscriber_id: Mapped['Subscriptions'] = relationship(foreign_keys=Subscriptions.user_id, back_populates='subscriber_id')

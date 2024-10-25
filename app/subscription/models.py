@@ -2,6 +2,7 @@ from sqlalchemy import UniqueConstraint, ForeignKey
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy.dialects.postgresql import JSONB
 from app.database import Base
+from typing import Optional
 
 
 class Subscriptions(Base):
@@ -10,7 +11,7 @@ class Subscriptions(Base):
     subscription_id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey('users.user_id'))
     user_sub_id: Mapped[int] = mapped_column(ForeignKey('users.user_id'))
-    notify_before_days: Mapped[list[int]] = mapped_column(JSONB)
+    notify_before_days: Mapped[Optional[list[int]]] = mapped_column(JSONB)
     notify_on_day: Mapped[bool]
 
     __table_args__ = (UniqueConstraint('user_id', 'user_sub_id', name='unique_subscription'),)
