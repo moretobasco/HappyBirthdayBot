@@ -1,12 +1,14 @@
 import asyncio
+import json
+from typing import Optional
 
 from app.dao.base import BaseDAO
 from app.database import async_session_maker
 from app.subscription.models import Subscriptions
 from app.users.models import Users
-from sqlalchemy import select, func, cast, and_, or_, Insert, insert, literal, update, delete
+from sqlalchemy import select, func, cast, and_, or_, literal, update, delete
 from sqlalchemy.orm import aliased
-from sqlalchemy.dialects.postgresql import INTERVAL, JSONB, insert as pg_insert
+from sqlalchemy.dialects.postgresql import INTERVAL, JSONB, insert
 from pprint import pprint
 from app.subscription.schemas import SSubscriptions
 from sqlalchemy.exc import IntegrityError
@@ -17,6 +19,30 @@ from pprint import pprint
 
 class SubscriptionsDAO(BaseDAO):
     model = Subscriptions
+
+    @classmethod
+    async def update_subscriptions_table(cls, notify_before_days: Optional[list[int]] = None):
+        if notify_before_days is None:
+            notify_before_days = [0]
+        async with async_session_maker() as session:
+            notify_before_days = json.dumps(notify_before_days)
+            u1 = aliased(Users)
+            u2 = aliased(Users)
+
+            all_users = select(
+                u1.user_id.label('user_id'),
+                u2.user_id.label('user_sub_id'),
+                cast(literal(notify_before_days), JSONB),
+                literal(True),
+                literal(12)
+            ).select_from(u1).join(u2, u1.user_id != u2.user_id)
+
+            add_subscriptions = insert(Subscriptions).from_select(
+                ['user_id', 'user_sub_id', 'notify_before_days', 'notify_on_day'], all_users
+            ).on_conflict_do_nothing(index_elements=['user_id', 'user_sub_id'])
+
+            await session.execute(add_subscriptions)
+            await session.commit()
 
     @classmethod
     async def get_subscriptions_for_messages(cls):
@@ -111,7 +137,6 @@ class SubscriptionsDAO(BaseDAO):
             await session.execute(deleted_subscription)
             await session.commit()
 
-
 # async def test_ser_model():
 #     messages = await SubscriptionsDAO.get_subs_v2()
 #     validated_messages = [SSubscriptions.model_validate(message) for message in messages]
@@ -121,20 +146,7 @@ class SubscriptionsDAO(BaseDAO):
 
 
 # async def main():
-#     # task = asyncio.create_task(SubscriptionsDAO.add_subscription(
-#     #     user_id=1,
-#     #     user_sub_id=2,
-#     #     notify_on_day=True,
-#     #     notify_before_days=[1]
-#     # ))
-#     task = asyncio.create_task(SubscriptionsDAO.subscribe_all_users(
-#         user_id=3, notify_before_days=[3]
-#     ))
+#     task = asyncio.create_task(SubscriptionsDAO.update_subscriptions_table())
 #     await asyncio.gather(task)
-#     # coro1 = UsersDAO.test()
-#     # await coro1
 #
-#
-# #
-# #
 # asyncio.get_event_loop().run_until_complete(main())

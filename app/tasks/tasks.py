@@ -8,6 +8,7 @@ from datetime import datetime
 from app.subscription.dao import SubscriptionsDAO
 import json
 from app.subscription.schemas import SSubscriptions
+from app.subscription.dao import SubscriptionsDAO
 
 scheduler = TaskiqScheduler(
     broker=broker,
@@ -35,6 +36,11 @@ async def send_message():
         return None
 
 
+# @broker.task(schedule=[{'cron': '* * * * *'}])
+# async def publish():
+#     await send_message()
+
+
 @broker.task(schedule=[{'cron': '* * * * *'}])
-async def publish():
-    await send_message()
+async def update_sub_table():
+    await SubscriptionsDAO.update_subscriptions_table()

@@ -7,7 +7,7 @@ class CorporateEmail(Base):
     __tablename__ = 'corporatemails'
 
     email_id: Mapped[int] = mapped_column(primary_key=True)
-    email: Mapped[str] = mapped_column()
+    email: Mapped[str] = mapped_column(unique=True, nullable=False)
 
     corporate_email: Mapped['Users'] = relationship(
         foreign_keys=email,

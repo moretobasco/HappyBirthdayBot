@@ -9,10 +9,11 @@ class Subscriptions(Base):
     __tablename__ = 'subscriptions'
 
     subscription_id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.user_id'))
-    user_sub_id: Mapped[int] = mapped_column(ForeignKey('users.user_id'))
-    notify_before_days: Mapped[Optional[list[int]]] = mapped_column(JSONB)
-    notify_on_day: Mapped[bool]
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.user_id', ondelete='CASCADE'), nullable=False)
+    user_sub_id: Mapped[int] = mapped_column(ForeignKey('users.user_id', ondelete='CASCADE'), nullable=False)
+    notify_before_days: Mapped[Optional[list[int]]] = mapped_column(JSONB, nullable=False)
+    notify_on_day: Mapped[bool] = mapped_column(nullable=False)
+    notification_hour: Mapped[int] = mapped_column(default=int(12))
 
     __table_args__ = (UniqueConstraint('user_id', 'user_sub_id', name='unique_subscription'),)
 
