@@ -21,7 +21,7 @@ class SubscriptionsDAO(BaseDAO):
     model = Subscriptions
 
     @classmethod
-    async def update_subscriptions_table(cls, notify_before_days: Optional[list[int]] = None):
+    async def create_subscriptions(cls, notify_before_days: Optional[list[int]] = None):
         if notify_before_days is None:
             notify_before_days = [0]
         async with async_session_maker() as session:
@@ -43,35 +43,6 @@ class SubscriptionsDAO(BaseDAO):
 
             await session.execute(add_subscriptions)
             await session.commit()
-
-    @classmethod
-    async def get_subscriptions_for_messages(cls):
-        """
-        SELECT *
-        FROM subscriptions
-        JOIN users ON users.user_id = subscriptions.user_sub_id
-        WHERE subscriptions.notify_before_days::jsonb @> to_jsonb(CAST(concat(
-        CAST(EXTRACT(year FROM CURRENT_DATE) AS VARCHAR),
-        lpad(CAST(EXTRACT(month FROM users.birthday) AS VARCHAR), 2, '0'),
-        lpad(CAST(EXTRACT(day FROM users.birthday) AS VARCHAR), 2, '0')) AS DATE) - CURRENT_DATE)
-        OR (CURRENT_DATE = users.birthday AND subscriptions.notify_on_day = TRUE)
-        """
-        async with async_session_maker() as session:
-            birthday_this_year = await BaseDAO.cast_birthday_to_current_year(Users.birthday)
-            query = select(
-                Subscriptions.__table__.columns,
-                Users.__table__.columns
-            ).join(Subscriptions, Users.user_id == Subscriptions.user_sub_id).where(
-                or_(
-                    Subscriptions.notify_before_days.contains(cast(func.to_jsonb(
-                        birthday_this_year - func.current_date()), JSONB)),
-                    and_(
-                        Users.birthday == func.current_user(),
-                        Subscriptions.notify_on_day == True)
-                )
-            )
-            result = await session.execute(query)
-            return result.mappings().all()
 
     @classmethod
     async def add_subscription(cls, user_id, user_sub_id, notify_before_days, notify_on_day):
@@ -137,16 +108,3 @@ class SubscriptionsDAO(BaseDAO):
             await session.execute(deleted_subscription)
             await session.commit()
 
-# async def test_ser_model():
-#     messages = await SubscriptionsDAO.get_subs_v2()
-#     validated_messages = [SSubscriptions.model_validate(message) for message in messages]
-#     for message in validated_messages:
-#         print(message.model_dump_json())
-#         print(type(message.model_dump()))
-
-
-# async def main():
-#     task = asyncio.create_task(SubscriptionsDAO.update_subscriptions_table())
-#     await asyncio.gather(task)
-#
-# asyncio.get_event_loop().run_until_complete(main())

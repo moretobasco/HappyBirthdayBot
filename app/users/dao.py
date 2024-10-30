@@ -54,14 +54,13 @@ class UsersDAO(BaseDAO):
                 lpad(CAST(EXTRACT(day FROM users.birthday) AS VARCHAR), 2, '0')) AS DATE) - CURRENT_DATE
         """
         async with (async_session_maker() as session):
-            birthday_this_year = await BaseDAO.cast_birthday_to_current_year(cls.model.birthday)
             query = select(
                 cls.model.__table__.columns
             ).where(
                 and_(
-                    birthday_this_year - func.current_date() <= duration,
-                    birthday_this_year - func.current_date() >= 0)
-            ).order_by(birthday_this_year - func.current_date())
+                    cls.cast_birthday_to_current_year(cls.model.birthday) - func.current_date() <= duration,
+                    cls.cast_birthday_to_current_year(cls.model.birthday) - func.current_date() >= 0)
+            ).order_by(cls.cast_birthday_to_current_year(cls.model.birthday) - func.current_date())
 
             result = await session.execute(query)
             return result.mappings().all()
@@ -72,50 +71,3 @@ class UsersDAO(BaseDAO):
             query = Insert(cls.model).values(**data)
             await session.execute(query)
             await session.commit()
-
-    @classmethod
-    async def add_user_and_create_subscriptions(cls, user_name, birthday, email, telegram, hashed_password,
-                                                notify_before_days):
-        async with async_session_maker() as session:
-            # add_user = Insert(Users).values(
-            #     user_name=user_name,
-            #     birthday=birthday,
-            #     email=email,
-            #     telegram=telegram,
-            #     hashed_password=password
-            # )
-            new_user = Users(
-                user_name=user_name,
-                birthday=birthday,
-                email=email,
-                telegram=telegram,
-                hashed_password=hashed_password
-            )
-            session.add(new_user)
-            await session.flush()
-
-            u1 = aliased(Users)
-            u2 = aliased(Users)
-
-            all_users = select(
-                u1.user_id.label('user_id'),
-                u2.user_id.label('user_sub_id'),
-                cast(literal(notify_before_days), JSONB),
-                literal(True)
-            ).select_from(u1).join(u2, u1.user_id != u2.user_id)
-
-            add_subscriptions = insert(Subscriptions).from_select(
-                ['user_id', 'user_sub_id', 'notify_before_days', 'notify_on_day'], all_users
-            ).on_conflict_do_nothing(index_elements=['user_id', 'user_sub_id'])
-
-            await session.execute(add_subscriptions)
-            await session.commit()
-
-# async def main():
-#     task = asyncio.create_task(UsersDAO.birthdays_in_horizon_v3(5))
-#     await asyncio.gather(task)
-#     # coro1 = UsersDAO.test()
-#     # await coro1
-#
-#
-# asyncio.get_event_loop().run_until_complete(main())

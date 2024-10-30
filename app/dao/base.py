@@ -23,7 +23,7 @@ class BaseDAO:
             return result.mappings().one_or_none()
 
     @classmethod
-    async def cast_birthday_to_current_year(cls, birthday: date):
+    def cast_birthday_to_current_year(cls, birthday: date):
         query = cast(func.concat(
             cast(func.extract('year', func.current_date()), VARCHAR),
             func.lpad(cast(func.extract('month', birthday), VARCHAR), 2, "0"),

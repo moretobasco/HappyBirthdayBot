@@ -16,9 +16,9 @@ class Notifications(Base):
     user_sub_id: Mapped[int] = mapped_column(ForeignKey('users.user_id', ondelete='CASCADE'), nullable=False)
     created_at: Mapped[datetime] = mapped_column(default=func.now())
     notification_date: Mapped[date] = mapped_column(nullable=False)
-    notification_time: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), nullable=False)
+    notification_time: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=False), nullable=False)
     status: Mapped[str] = mapped_column(ForeignKey('statuses.status_id'), nullable=False, server_default=text('1'))
-    sent_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True))
+    sent_at: Mapped[datetime]
 
     __table_args__ = (UniqueConstraint('user_id', 'user_sub_id', 'notification_date', name='unique_notification'),)
 
