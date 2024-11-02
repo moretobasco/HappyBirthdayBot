@@ -38,7 +38,7 @@ class SubscriptionsDAO(BaseDAO):
             ).select_from(u1).join(u2, u1.user_id != u2.user_id)
 
             add_subscriptions = insert(Subscriptions).from_select(
-                ['user_id', 'user_sub_id', 'notify_before_days', 'notify_on_day'], all_users
+                ['user_id', 'user_sub_id', 'notify_before_days', 'notify_on_day', 'notification_hour'], all_users
             ).on_conflict_do_nothing(index_elements=['user_id', 'user_sub_id'])
 
             await session.execute(add_subscriptions)

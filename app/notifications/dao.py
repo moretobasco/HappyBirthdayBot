@@ -1,6 +1,6 @@
 import asyncio
 import json
-from typing import Optional
+from typing import Optional, Tuple, List
 
 import pytz
 from pytz import timezone, UTC
@@ -32,7 +32,6 @@ class NotificationsDao(BaseDAO):
     async def create_notifications(cls):
         async with async_session_maker() as session:
             current_date = func.current_date()
-            # current_time = date(datetime.utcnow())
             u1 = aliased(Users)
             u2 = aliased(Users)
             s = aliased(Subscriptions)
@@ -72,6 +71,10 @@ class NotificationsDao(BaseDAO):
                     notification_hour=notification_hour
                 )
 
+                if not all([subscription_id, user_id, user_sub_id, notification_date, notification_utc_time]):
+                    print(f'Skipping row {subscription_id} with missing data')
+                    continue
+
                 notifications.append(
                     {
                         'subscription_id': subscription_id,
@@ -99,7 +102,8 @@ class NotificationsDao(BaseDAO):
                 Notifications.__table__.columns,
                 u1.telegram,
                 u1.email,
-                u2.birthday
+                u2.birthday,
+                u2.user_name.label('user_sub_name'),
             ).select_from(Notifications).join(
                 u1, u1.user_id == Notifications.user_id
             ).join(
@@ -114,15 +118,15 @@ class NotificationsDao(BaseDAO):
             return result.mappings().all()
 
     @classmethod
-    async def change_notification_status(cls, notification_id: int, status: int, sent_at: Optional[datetime] = None):
+    async def change_notification_status(cls, notifications: List[Tuple[int, int, Optional[datetime]]]):
         async with async_session_maker() as session:
-            updated_status = update(Notifications).filter_by(
-                notification_id=notification_id).values(status=status,
-                                                        sent_at=sent_at).execution_options(synchronize_session='fetch'
-                                                                                           )
-            await session.execute(updated_status)
+            for notification_id, status, sent_at in notifications:
+                updated_status = update(Notifications).where(
+                    Notifications.notification_id == notification_id).values(
+                    status=status, sent_at=sent_at
+                ).execution_options(synchronize_session='fetch')
+                await session.execute(updated_status)
             await session.commit()
-
 
 # async def main():
 #     task = asyncio.create_task(NotificationsDao.get_notifications_for_messages())

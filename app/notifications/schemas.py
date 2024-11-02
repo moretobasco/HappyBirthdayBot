@@ -10,6 +10,7 @@ class SNotifications(BaseModel):
     subscription_id: int
     user_id: int
     user_sub_id: int
+    user_sub_name: str
     created_at: datetime
     notification_date: date
     notification_time: datetime

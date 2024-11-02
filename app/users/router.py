@@ -1,15 +1,9 @@
-import json
-from typing import Optional
-
 from fastapi import APIRouter, Depends
 
 from app.admin.auth import get_password_hash
 from app.users.dao import UsersDAO
 from app.users.schemas import SUserAuth, SUserRegister
-from app.exceptions import UserAlreadyExistsException, CorporateEmailNotExists, IncorrectPasswordException, \
-    ExpiredPasswordException
 from app.corporate_emails.email_service import async_send_mail, generate_secret
-from app.corporate_emails.dao import CorporateEmailDAO
 from app.redis.redis_app import r
 from app.users.auth import check_existing_user_and_corporate, verify_password
 from app.users.dependencies import get_current_user
@@ -45,19 +39,3 @@ async def register_user(user_data: SUserRegister) -> None:
 @router.get('/me')
 async def read_my_user(current_user=Depends(get_current_user)):
     return current_user
-
-
-@router.post('/registerv2')
-async def register_user(user_data: SUserRegister, notify_before_days: Optional[list[int]] = 0) -> None:
-    await check_existing_user_and_corporate(user_data=user_data)
-    await verify_password(user_data=user_data)
-    hashed_password = get_password_hash(user_data.admin_password)
-    notify_before_days = json.dumps(notify_before_days)
-    await UsersDAO.add_user_and_create_subscriptions(
-        user_name=user_data.user_name,
-        email=user_data.email,
-        birthday=user_data.birthday,
-        telegram=user_data.telegram,
-        hashed_password=hashed_password,
-        notify_before_days=notify_before_days
-    )

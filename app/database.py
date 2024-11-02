@@ -10,10 +10,10 @@ from sqlalchemy import func, NullPool
 # подумать, как сделать поумнее, возможно пронаследоваться от BaseSettings, как сделал нижк, пока итак работает
 if settings.MODE == 'TEST':
     DATABASE_URL = settings.TEST_DATABASE_URL
-    DATABASE_PARAMS = {'poolclass': NullPool, 'echo': True}
+    DATABASE_PARAMS = {'poolclass': NullPool}
 else:
     DATABASE_URL = settings.DATABASE_URL
-    DATABASE_PARAMS = {'echo': True}
+    DATABASE_PARAMS = {}
 
 engine = create_async_engine(DATABASE_URL, **DATABASE_PARAMS)
 async_session_maker = async_sessionmaker(bind=engine, expire_on_commit=False)

@@ -10,10 +10,6 @@ from app.subscription.models import Subscriptions
 
 from app.database import Base
 
-"""
-(birthday+MAKE_INTERVAL(EXTRACT(YEAR FROM CURRENT_DATE) :: INTEGER-EXTRACT(YEAR FROM birthday) :: INTEGER)) :: DATE - CURRENT_DATE
-"""
-
 
 class Users(Base):
     __tablename__ = 'users'
